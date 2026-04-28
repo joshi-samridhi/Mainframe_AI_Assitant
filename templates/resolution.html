@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Resolution - Mainframe AI Support{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--text-bright-green); margin-bottom: 30px;">
+    🔧 RESOLUTION & VISUAL DEBUGGING
+</h1>
+
+<!-- Error Code Summary -->
+<div class="card" style="background-color: var(--hover-bg); border-color: var(--error-red);">
+    <div class="card-header" style="color: var(--error-red);">
+        ERROR CODE: {{ analysis.return_code }}
+    </div>
+    
+    {% if error_info %}
+    <h2 style="color: var(--text-bright-green); margin-bottom: 15px;">
+        {{ error_info.name }}
+    </h2>
+    <p style="line-height: 1.8;">{{ error_info.description }}</p>
+    {% else %}
+    <p style="color: var(--warning-yellow);">
+        ⚠️ No detailed information available for this error code.
+    </p>
+    {% endif %}
+</div>
+
+<!-- Annotated Image -->
+{% if analysis.annotated_image_path %}
+<div class="card">
+    <div class="card-header">📸 ANNOTATED ERROR SCREEN</div>
+    <div style="text-align: center;">
+        <img src="{{ url_for('serve_output', filename=analysis.annotated_image_path.split('/')[-1]) }}" 
+             alt="Annotated Error Screen" 
+             class="annotated-image">
+    </div>
+    <p style="text-align: center; margin-top: 15px; color: var(--text-dim-green); font-size: 14px;">
+        Visual representation with highlighted error areas and resolution checklist
+    </p>
+</div>
+{% endif %}
+
+<!-- Common Causes -->
+{% if error_info and error_info.common_causes %}
+<div class="card">
+    <div class="card-header">🔍 COMMON CAUSES</div>
+    <ul style="list-style: none; padding-left: 0;">
+        {% for cause in error_info.common_causes %}
+        <li style="padding: 10px; margin-bottom: 8px; background-color: var(--bg-darker); border-left: 3px solid var(--warning-yellow);">
+            • {{ cause }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<!-- Resolution Steps -->
+{% if error_info and error_info.resolution_steps %}
+<div class="card">
+    <div class="card-header">✅ RESOLUTION STEPS</div>
+    <ol class="resolution-steps">
+        {% for step in error_info.resolution_steps %}
+        <li>{{ step }}</li>
+        {% endfor %}
+    </ol>
+</div>
+{% endif %}
+
+<!-- Prevention Tips -->
+{% if error_info and error_info.prevention %}
+<div class="card">
+    <div class="card-header">🛡️ PREVENTION TIPS</div>
+    <ul style="list-style: none; padding-left: 0;">
+        {% for tip in error_info.prevention %}
+        <li style="padding: 10px; margin-bottom: 8px; background-color: var(--bg-darker); border-left: 3px solid var(--text-green);">
+            • {{ tip }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<!-- Next Step Prompt -->
+<div class="card" style="background-color: var(--hover-bg); border-color: var(--info-cyan);">
+    <div class="card-header" style="color: var(--info-cyan);">
+        STEP 3: VIEW PREVIOUS INCIDENTS?
+    </div>
+    
+    <p style="font-size: 18px; margin-bottom: 20px;">
+        Would you like to see previous INC records for similar issues?
+    </p>
+    
+    {% if related_incs %}
+    <p style="margin-bottom: 15px;">
+        Found <strong style="color: var(--text-bright-green);">{{ related_incs|length }}</strong> related incident(s) for error code <strong style="color: var(--error-red);">{{ analysis.return_code }}</strong>:
+    </p>
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+        {% for inc in related_incs %}
+        <a href="{{ url_for('inc_detail', inc_number=inc.inc_number) }}" class="inc-link">
+            {{ inc.inc_number }}
+        </a>
+        {% endfor %}
+    </div>
+    
+    <p style="font-size: 14px; color: var(--text-dim-green);">
+        💡 Click on any INC number to view detailed resolution history
+    </p>
+    {% else %}
+    <p style="color: var(--warning-yellow);">
+        ⚠️ No previous incident records found for this error code.
+    </p>
+    {% endif %}
+</div>
+
+<!-- Actions -->
+<div class="card">
+    <div class="card-header">ACTIONS</div>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="{{ url_for('analyze') }}" class="btn btn-primary">
+            🔄 New Analysis
+        </a>
+        <a href="{{ url_for('result', analysis_id=analysis.id) }}" class="btn">
+            ⬅️ Back to Results
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn">
+            🏠 Dashboard
+        </a>
+        <button onclick="window.print()" class="btn">
+            🖨️ Print Resolution
+        </button>
+    </div>
+</div>
+
+<style>
+@media print {
+    header, nav, footer, .btn, .card:last-child {
+        display: none !important;
+    }
+    .inc-link {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+    }
+}
+</style>
+{% endblock %}

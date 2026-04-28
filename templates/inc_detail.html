@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}{{ inc.inc_number }} - Mainframe AI Support{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--text-bright-green); margin-bottom: 30px;">
+    📋 INCIDENT RECORD
+</h1>
+
+<!-- INC Header -->
+<div class="card" style="background-color: var(--hover-bg); border-color: var(--info-cyan);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <h2 style="color: var(--info-cyan); font-size: 32px; margin-bottom: 10px;">
+                {{ inc.inc_number }}
+            </h2>
+            <p style="color: var(--text-dim-green);">
+                Created: {{ inc.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+            </p>
+        </div>
+        <div style="text-align: right;">
+            <div style="display: inline-block; padding: 10px 20px; background-color: {% if inc.status == 'Resolved' %}var(--text-green){% elif inc.status == 'Closed' %}var(--text-dim-green){% else %}var(--warning-yellow){% endif %}; color: var(--bg-dark); font-weight: bold; border-radius: 4px;">
+                {{ inc.status }}
+            </div>
+            {% if inc.resolved_at %}
+            <p style="margin-top: 10px; color: var(--text-dim-green); font-size: 14px;">
+                Resolved: {{ inc.resolved_at.strftime('%Y-%m-%d %H:%M:%S') }}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Error Information -->
+<div class="card">
+    <div class="card-header">ERROR INFORMATION</div>
+    <div class="terminal-output">
+<span class="field-label">ERROR CODE:</span>  <span class="field-value" style="color: var(--error-red); font-weight: bold;">{{ inc.error_code }}</span>
+<span class="field-label">JOBNAME:</span>     <span class="field-value">{{ inc.jobname or 'N/A' }}</span>
+<span class="field-label">INC NUMBER:</span>  <span class="field-value">{{ inc.inc_number }}</span>
+<span class="field-label">STATUS:</span>      <span class="field-value">{{ inc.status }}</span>
+    </div>
+</div>
+
+<!-- Problem Description -->
+<div class="card">
+    <div class="card-header">PROBLEM DESCRIPTION</div>
+    <div style="padding: 15px; background-color: var(--bg-darker); border-left: 4px solid var(--error-red); line-height: 1.8;">
+        {{ inc.description }}
+    </div>
+</div>
+
+<!-- Resolution -->
+<div class="card">
+    <div class="card-header">✅ RESOLUTION</div>
+    <div style="padding: 15px; background-color: var(--bg-darker); border-left: 4px solid var(--text-green); line-height: 1.8;">
+        {{ inc.resolution }}
+    </div>
+</div>
+
+<!-- Timeline -->
+{% if inc.resolved_at %}
+<div class="card">
+    <div class="card-header">⏱️ TIMELINE</div>
+    <div style="position: relative; padding-left: 40px;">
+        <!-- Created -->
+        <div style="margin-bottom: 30px; position: relative;">
+            <div style="position: absolute; left: -30px; top: 5px; width: 20px; height: 20px; background-color: var(--warning-yellow); border-radius: 50%;"></div>
+            <div style="position: absolute; left: -21px; top: 25px; width: 2px; height: 40px; background-color: var(--text-dim-green);"></div>
+            <strong style="color: var(--warning-yellow);">INCIDENT CREATED</strong>
+            <p style="color: var(--text-dim-green); font-size: 14px;">
+                {{ inc.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+            </p>
+        </div>
+        
+        <!-- Resolved -->
+        <div style="position: relative;">
+            <div style="position: absolute; left: -30px; top: 5px; width: 20px; height: 20px; background-color: var(--text-green); border-radius: 50%;"></div>
+            <strong style="color: var(--text-green);">INCIDENT RESOLVED</strong>
+            <p style="color: var(--text-dim-green); font-size: 14px;">
+                {{ inc.resolved_at.strftime('%Y-%m-%d %H:%M:%S') }}
+            </p>
+            {% set duration = (inc.resolved_at - inc.created_at).total_seconds() %}
+            {% set hours = (duration // 3600)|int %}
+            {% set minutes = ((duration % 3600) // 60)|int %}
+            <p style="color: var(--text-bright-green); font-size: 14px; margin-top: 5px;">
+                Resolution Time: 
+                {% if hours > 0 %}{{ hours }} hour{{ 's' if hours != 1 else '' }}{% endif %}
+                {% if minutes > 0 %}{{ minutes }} minute{{ 's' if minutes != 1 else '' }}{% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Related Information -->
+<div class="card">
+    <div class="card-header">📚 RELATED INFORMATION</div>
+    <p style="margin-bottom: 15px;">
+        This incident is related to error code <strong style="color: var(--error-red);">{{ inc.error_code }}</strong>.
+    </p>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="{{ url_for('analyze') }}" class="btn">
+            🔍 Analyze Similar Log
+        </a>
+        <button onclick="copyIncDetails()" class="btn">
+            📋 Copy INC Details
+        </button>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="card">
+    <div class="card-header">ACTIONS</div>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="javascript:history.back()" class="btn btn-primary">
+            ⬅️ Back
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn">
+            🏠 Dashboard
+        </a>
+        <a href="{{ url_for('analyze') }}" class="btn">
+            🔄 New Analysis
+        </a>
+        <button onclick="window.print()" class="btn">
+            🖨️ Print INC
+        </button>
+    </div>
+</div>
+
+<script>
+function copyIncDetails() {
+    const text = `INCIDENT RECORD: {{ inc.inc_number }}
+═══════════════════════════════════════════════════════════════
+
+ERROR CODE:   {{ inc.error_code }}
+JOBNAME:      {{ inc.jobname or 'N/A' }}
+STATUS:       {{ inc.status }}
+CREATED:      {{ inc.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+{% if inc.resolved_at %}RESOLVED:     {{ inc.resolved_at.strftime('%Y-%m-%d %H:%M:%S') }}{% endif %}
+
+PROBLEM DESCRIPTION:
+{{ inc.description }}
+
+RESOLUTION:
+{{ inc.resolution }}
+
+═══════════════════════════════════════════════════════════════`;
+
+    navigator.clipboard.writeText(text).then(function() {
+        alert('✅ INC details copied to clipboard!');
+    }, function(err) {
+        alert('❌ Failed to copy: ' + err);
+    });
+}
+</script>
+
+<style>
+@media print {
+    header, nav, footer, .btn, .card:last-child {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}

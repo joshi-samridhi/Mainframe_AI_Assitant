@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Mainframe AI Support{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--text-bright-green); margin-bottom: 30px;">
+    ⚡ DASHBOARD
+</h1>
+
+<div style="margin-bottom: 30px;">
+    <p style="font-size: 18px;">
+        Welcome back, <span style="color: var(--text-bright-green);">{{ current_user.full_name or current_user.username }}</span>!
+    </p>
+    {% if current_user.last_login %}
+    <p style="color: var(--text-dim-green); font-size: 14px;">
+        Last login: {{ current_user.last_login.strftime('%Y-%m-%d %H:%M:%S') }}
+    </p>
+    {% endif %}
+</div>
+
+<!-- Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_analyses }}</div>
+        <div class="stat-label">TOTAL ANALYSES</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-number">{{ error_codes|length }}</div>
+        <div class="stat-label">UNIQUE ERROR CODES</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-number">{{ recent_analyses|length }}</div>
+        <div class="stat-label">RECENT ANALYSES</div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <div class="card-header">QUICK ACTIONS</div>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="{{ url_for('analyze') }}" class="btn btn-primary">
+            📊 New Analysis
+        </a>
+        <a href="{{ url_for('history') }}" class="btn">
+            📜 View History
+        </a>
+        <a href="{{ url_for('profile') }}" class="btn">
+            👤 My Profile
+        </a>
+    </div>
+</div>
+
+<!-- Most Common Error Codes -->
+{% if error_codes %}
+<div class="card">
+    <div class="card-header">MOST COMMON ERROR CODES</div>
+    <table>
+        <thead>
+            <tr>
+                <th>ERROR CODE</th>
+                <th>OCCURRENCES</th>
+                <th>ACTION</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for code, count in error_codes %}
+            <tr>
+                <td style="color: var(--error-red); font-weight: bold;">{{ code }}</td>
+                <td>{{ count }}</td>
+                <td>
+                    <a href="{{ url_for('analyze') }}" class="btn" style="padding: 5px 15px; font-size: 12px;">
+                        Analyze
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Recent Analyses -->
+{% if recent_analyses %}
+<div class="card">
+    <div class="card-header">RECENT ANALYSES</div>
+    <table>
+        <thead>
+            <tr>
+                <th>DATE</th>
+                <th>JOBNAME</th>
+                <th>RETURN CODE</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for analysis in recent_analyses %}
+            <tr>
+                <td>{{ analysis.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ analysis.jobname or 'N/A' }}</td>
+                <td style="color: var(--error-red); font-weight: bold;">
+                    {{ analysis.return_code or 'N/A' }}
+                </td>
+                <td>{{ analysis.status or 'N/A' }}</td>
+                <td>
+                    <a href="{{ url_for('result', analysis_id=analysis.id) }}" class="btn" style="padding: 5px 15px; font-size: 12px;">
+                        View
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if total_analyses > 5 %}
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('history') }}" class="btn">
+            View All Analyses ({{ total_analyses }})
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-header">RECENT ANALYSES</div>
+    <p style="text-align: center; padding: 40px; color: var(--text-dim-green);">
+        No analyses yet. Start by analyzing your first mainframe log!
+    </p>
+    <div style="text-align: center;">
+        <a href="{{ url_for('analyze') }}" class="btn btn-primary">
+            📊 Start First Analysis
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Help Section -->
+<div class="card">
+    <div class="card-header">HOW TO USE</div>
+    <div style="line-height: 2;">
+        <p><strong>STEP 1:</strong> Upload or paste your mainframe log</p>
+        <p><strong>STEP 2:</strong> Review extracted information (JOBNAME, JOBID, RETURN CODE, etc.)</p>
+        <p><strong>STEP 3:</strong> View resolution steps and annotated error screen</p>
+        <p><strong>STEP 4:</strong> Check previous incident records for similar issues</p>
+    </div>
+</div>
+{% endblock %}

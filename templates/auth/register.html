@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Mainframe AI Support{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 80px auto;">
+    <div class="card">
+        <div class="card-header" style="text-align: center; font-size: 28px;">
+            ⚡ MAINFRAME AI SUPPORT
+        </div>
+        
+        <h2 style="text-align: center; margin: 20px 0; color: var(--text-bright-green);">
+            CREATE ACCOUNT
+        </h2>
+        
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="form-group">
+                <label for="username">USERNAME *</label>
+                <input type="text" id="username" name="username" required autofocus 
+                       placeholder="Choose a username (min 3 characters)"
+                       minlength="3" maxlength="80">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">EMAIL *</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="Enter your email address">
+            </div>
+            
+            <div class="form-group">
+                <label for="full_name">FULL NAME</label>
+                <input type="text" id="full_name" name="full_name" 
+                       placeholder="Enter your full name (optional)"
+                       maxlength="100">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">PASSWORD *</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Choose a strong password (min 8 characters)"
+                       minlength="8">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">CONFIRM PASSWORD *</label>
+                <input type="password" id="confirm_password" name="confirm_password" required 
+                       placeholder="Re-enter your password"
+                       minlength="8">
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">
+                    REGISTER
+                </button>
+            </div>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-green);">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px; color: var(--text-dim-green); font-size: 12px;">
+        <p>⚠️ AUTHORIZED PERSONNEL ONLY ⚠️</p>
+        <p>By registering, you agree to use this system responsibly</p>
+    </div>
+</div>
+
+<script>
+// Client-side password confirmation validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        alert('Passwords do not match!');
+        return false;
+    }
+});
+</script>
+{% endblock %}

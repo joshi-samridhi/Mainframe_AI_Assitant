@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Result - Mainframe AI Support{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--text-bright-green); margin-bottom: 30px;">
+    ✅ EXTRACTION COMPLETE
+</h1>
+
+<!-- Extracted Information -->
+<div class="card">
+    <div class="card-header">STEP 1: EXTRACTED INFORMATION</div>
+    
+    <div class="terminal-output">
+<span class="field-label">JOBNAME:</span>      <span class="{% if analysis.jobname == 'NOT FOUND' %}not-found{% else %}field-value{% endif %}">{{ analysis.jobname or 'NOT FOUND' }}</span>
+<span class="field-label">JOBID:</span>        <span class="{% if analysis.jobid == 'NOT FOUND' %}not-found{% else %}field-value{% endif %}">{{ analysis.jobid or 'NOT FOUND' }}</span>
+<span class="field-label">STATUS:</span>       <span class="{% if analysis.status == 'NOT FOUND' %}not-found{% else %}field-value{% endif %}">{{ analysis.status or 'NOT FOUND' }}</span>
+<span class="field-label">RETURN CODE:</span>  <span class="{% if analysis.return_code == 'NOT FOUND' %}not-found{% else %}field-value{% endif %}" style="{% if analysis.return_code != 'NOT FOUND' %}color: var(--error-red); font-weight: bold;{% endif %}">{{ analysis.return_code or 'NOT FOUND' }}</span>
+<span class="field-label">STEP:</span>         <span class="{% if analysis.step == 'NOT FOUND' %}not-found{% else %}field-value{% endif %}">{{ analysis.step or 'NOT FOUND' }}</span>
+<span class="field-label">ERROR:</span>        <span class="{% if analysis.error_message == 'NOT FOUND' %}not-found{% else %}field-value{% endif %}">{{ analysis.error_message or 'NOT FOUND' }}</span>
+
+<span style="color: var(--text-dim-green);">─────────────────────────────────────────────────────────────────</span>
+<span class="field-label">EXTRACTION METHOD:</span> <span class="field-value">{{ analysis.extraction_method|upper }}</span>
+<span class="field-label">ANALYSIS DATE:</span>     <span class="field-value">{{ analysis.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+    </div>
+</div>
+
+<!-- Original Log Content -->
+{% if analysis.log_content %}
+<div class="card">
+    <div class="card-header">ORIGINAL LOG CONTENT</div>
+    <div class="terminal-output" style="max-height: 400px; overflow-y: auto;">{{ analysis.log_content }}</div>
+</div>
+{% endif %}
+
+<!-- Next Step Prompt -->
+<div class="card" style="background-color: var(--hover-bg); border-color: var(--warning-yellow);">
+    <div class="card-header" style="color: var(--warning-yellow);">
+        STEP 2: VIEW RESOLUTION?
+    </div>
+    
+    <p style="font-size: 18px; margin-bottom: 20px;">
+        Would you like to see the resolution and annotated image?
+    </p>
+    
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        {% if analysis.return_code and analysis.return_code != 'NOT FOUND' %}
+        <a href="{{ url_for('resolution', analysis_id=analysis.id) }}" class="btn btn-primary" style="font-size: 16px;">
+            ✅ YES - Show Resolution
+        </a>
+        {% else %}
+        <button class="btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+            ⚠️ No Error Code Found
+        </button>
+        {% endif %}
+        
+        <a href="{{ url_for('analyze') }}" class="btn">
+            🔄 New Analysis
+        </a>
+        
+        <a href="{{ url_for('dashboard') }}" class="btn">
+            🏠 Back to Dashboard
+        </a>
+    </div>
+    
+    {% if not analysis.return_code or analysis.return_code == 'NOT FOUND' %}
+    <p style="margin-top: 20px; color: var(--warning-yellow); font-size: 14px;">
+        ⚠️ Resolution information requires a valid error code. Please try analyzing a different log.
+    </p>
+    {% endif %}
+</div>
+
+<!-- Analysis Actions -->
+<div class="card">
+    <div class="card-header">ANALYSIS ACTIONS</div>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="{{ url_for('history') }}" class="btn">
+            📜 View All Analyses
+        </a>
+        <button onclick="window.print()" class="btn">
+            🖨️ Print Results
+        </button>
+        <button onclick="copyToClipboard()" class="btn">
+            📋 Copy to Clipboard
+        </button>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const text = `MAINFRAME LOG ANALYSIS RESULTS
+═══════════════════════════════════════════════════════════════
+
+JOBNAME:      {{ analysis.jobname or 'NOT FOUND' }}
+JOBID:        {{ analysis.jobid or 'NOT FOUND' }}
+STATUS:       {{ analysis.status or 'NOT FOUND' }}
+RETURN CODE:  {{ analysis.return_code or 'NOT FOUND' }}
+STEP:         {{ analysis.step or 'NOT FOUND' }}
+ERROR:        {{ analysis.error_message or 'NOT FOUND' }}
+
+EXTRACTION METHOD: {{ analysis.extraction_method|upper }}
+ANALYSIS DATE:     {{ analysis.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+
+═══════════════════════════════════════════════════════════════`;
+
+    navigator.clipboard.writeText(text).then(function() {
+        alert('✅ Results copied to clipboard!');
+    }, function(err) {
+        alert('❌ Failed to copy: ' + err);
+    });
+}
+</script>
+
+<style>
+@media print {
+    header, nav, footer, .btn, .card:last-child {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}

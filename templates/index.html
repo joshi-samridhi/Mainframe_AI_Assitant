@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}New Analysis - Mainframe AI Support{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--text-bright-green); margin-bottom: 30px;">
+    📊 NEW LOG ANALYSIS
+</h1>
+
+<div class="card">
+    <div class="card-header">STEP 1: EXTRACT INFORMATION</div>
+    
+    <p style="margin-bottom: 20px; color: var(--text-dim-green);">
+        Upload a mainframe log file or paste log content below. The system will extract:
+        JOBNAME, JOBID, STATUS, RETURN CODE, STEP, and ERROR information.
+    </p>
+    
+    <form method="POST" action="{{ url_for('analyze') }}" enctype="multipart/form-data">
+        <!-- File Upload Option -->
+        <div class="form-group">
+            <label for="log_file">📁 UPLOAD LOG FILE (Text or Image)</label>
+            <input type="file" id="log_file" name="log_file" 
+                   accept=".txt,.log,.png,.jpg,.jpeg,.bmp,.tiff">
+            <p style="font-size: 12px; color: var(--text-dim-green); margin-top: 5px;">
+                Supported formats: TXT, LOG, PNG, JPG, JPEG, BMP, TIFF
+            </p>
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0; color: var(--text-dim-green);">
+            - OR -
+        </div>
+        
+        <!-- Text Input Option -->
+        <div class="form-group">
+            <label for="log_content">📝 PASTE LOG CONTENT</label>
+            <textarea id="log_content" name="log_content" 
+                      placeholder="Paste your mainframe log content here...
+
+Example:
+JOBNAME: DUMMYBATCH01
+JOBID: 12345
+STATUS: ABEND
+RETURN CODE: U0777
+STEP: STEP002
+ERROR: DATA VALIDATION FAILED
+
+Job Log:
+Invalid record RECORD#007, STEP002 ended abnormally"></textarea>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">
+                🔍 ANALYZE LOG
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Information Card -->
+<div class="card">
+    <div class="card-header">ℹ️ ANALYSIS METHODS</div>
+    <div style="line-height: 2;">
+        <p><strong style="color: var(--text-bright-green);">1. Rule-Based Extraction (Primary):</strong></p>
+        <p style="margin-left: 20px;">Uses regex patterns to extract information from standard mainframe log formats.</p>
+        
+        <p style="margin-top: 15px;"><strong style="color: var(--text-bright-green);">2. OCR Processing (For Images):</strong></p>
+        <p style="margin-left: 20px;">Extracts text from terminal screenshots using Tesseract OCR.</p>
+        
+        <p style="margin-top: 15px;"><strong style="color: var(--text-bright-green);">3. AI Fallback (Optional):</strong></p>
+        <p style="margin-left: 20px;">Uses OpenAI API for complex logs when regex confidence is low.</p>
+    </div>
+</div>
+
+<!-- Supported Error Codes -->
+<div class="card">
+    <div class="card-header">🔧 SUPPORTED ERROR CODES</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div style="padding: 10px; background-color: var(--bg-darker); border-left: 3px solid var(--error-red);">
+            <strong>U0777</strong> - Data Validation Abend
+        </div>
+        <div style="padding: 10px; background-color: var(--bg-darker); border-left: 3px solid var(--error-red);">
+            <strong>S013</strong> - Dataset Open Error
+        </div>
+        <div style="padding: 10px; background-color: var(--bg-darker); border-left: 3px solid var(--error-red);">
+            <strong>S0C7</strong> - Numeric Data Exception
+        </div>
+        <div style="padding: 10px; background-color: var(--bg-darker); border-left: 3px solid var(--error-red);">
+            <strong>S0C4</strong> - Protection Exception
+        </div>
+        <div style="padding: 10px; background-color: var(--bg-darker); border-left: 3px solid var(--error-red);">
+            <strong>S0C1</strong> - Operation Exception
+        </div>
+        <div style="padding: 10px; background-color: var(--bg-darker); border-left: 3px solid var(--error-red);">
+            <strong>S322</strong> - Time-Out
+        </div>
+        <div style="padding: 10px; background-color: var(--bg-darker); border-left: 3px solid var(--error-red);">
+            <strong>S806</strong> - Program Not Found
+        </div>
+        <div style="padding: 10px; background-color: var(--bg-darker); border-left: 3px solid var(--error-red);">
+            <strong>S222</strong> - Job Cancelled
+        </div>
+    </div>
+</div>
+
+<script>
+// Clear textarea when file is selected
+document.getElementById('log_file').addEventListener('change', function() {
+    if (this.files.length > 0) {
+        document.getElementById('log_content').value = '';
+    }
+});
+
+// Clear file input when text is entered
+document.getElementById('log_content').addEventListener('input', function() {
+    if (this.value.trim().length > 0) {
+        document.getElementById('log_file').value = '';
+    }
+});
+</script>
+{% endblock %}

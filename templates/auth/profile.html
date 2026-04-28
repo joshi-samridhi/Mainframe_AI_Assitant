@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Mainframe AI Support{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--text-bright-green); margin-bottom: 30px;">
+    👤 USER PROFILE
+</h1>
+
+<!-- User Information -->
+<div class="card">
+    <div class="card-header">ACCOUNT INFORMATION</div>
+    <div class="terminal-output">
+<span class="field-label">USERNAME:</span>     <span class="field-value">{{ current_user.username }}</span>
+<span class="field-label">EMAIL:</span>        <span class="field-value">{{ current_user.email }}</span>
+<span class="field-label">FULL NAME:</span>    <span class="field-value">{{ current_user.full_name or 'Not set' }}</span>
+<span class="field-label">MEMBER SINCE:</span> <span class="field-value">{{ current_user.created_at.strftime('%Y-%m-%d') }}</span>
+{% if current_user.last_login %}
+<span class="field-label">LAST LOGIN:</span>   <span class="field-value">{{ current_user.last_login.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+{% endif %}
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="card">
+    <div class="card-header">USAGE STATISTICS</div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ current_user.analyses.count() }}</div>
+            <div class="stat-label">TOTAL ANALYSES</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-number">
+                {{ (current_user.created_at - current_user.created_at).days if current_user.created_at else 0 }}
+            </div>
+            <div class="stat-label">DAYS ACTIVE</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-number">
+                {{ current_user.analyses.filter_by(extraction_method='hybrid').count() }}
+            </div>
+            <div class="stat-label">AI-ASSISTED</div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+{% set recent = current_user.analyses.order_by(current_user.analyses.class_.created_at.desc()).limit(5).all() %}
+{% if recent %}
+<div class="card">
+    <div class="card-header">RECENT ACTIVITY</div>
+    <table>
+        <thead>
+            <tr>
+                <th>DATE</th>
+                <th>RETURN CODE</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for analysis in recent %}
+            <tr>
+                <td>{{ analysis.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td style="color: var(--error-red); font-weight: bold;">
+                    {{ analysis.return_code or 'N/A' }}
+                </td>
+                <td>{{ analysis.status or 'N/A' }}</td>
+                <td>
+                    <a href="{{ url_for('result', analysis_id=analysis.id) }}" 
+                       class="btn" style="padding: 5px 15px; font-size: 12px;">
+                        View
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Actions -->
+<div class="card">
+    <div class="card-header">ACTIONS</div>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="{{ url_for('history') }}" class="btn btn-primary">
+            📜 View Full History
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn">
+            🏠 Dashboard
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-danger">
+            🚪 Logout
+        </a>
+    </div>
+</div>
+
+<!-- System Information -->
+<div class="card">
+    <div class="card-header">SYSTEM INFORMATION</div>
+    <div style="line-height: 2; color: var(--text-dim-green); font-size: 14px;">
+        <p><strong>Application:</strong> Mainframe AI Support Assistant v1.0.0</p>
+        <p><strong>Features:</strong> Log Analysis, OCR Processing, AI Fallback, Visual Debugging</p>
+        <p><strong>Supported Error Codes:</strong> U0777, S013, S0C7, S0C4, S0C1, S322, S806, S222</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mainframe AI Support Assistant{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <header>
+        <div class="header-content">
+            <a href="{{ url_for('dashboard') }}" class="logo">⚡ MAINFRAME AI SUPPORT</a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}class="active"{% endif %}>Dashboard</a></li>
+                    <li><a href="{{ url_for('analyze') }}" {% if request.endpoint == 'analyze' %}class="active"{% endif %}>New Analysis</a></li>
+                    <li><a href="{{ url_for('history') }}" {% if request.endpoint == 'history' %}class="active"{% endif %}>History</a></li>
+                    <li><a href="{{ url_for('profile') }}" {% if request.endpoint == 'profile' %}class="active"{% endif %}>Profile</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    {% endif %}
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>Mainframe AI Support Assistant v1.0.0 | Powered by Flask & AI</p>
+        <p>© 2026 | Made with ❤️ for Mainframe Engineers</p>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

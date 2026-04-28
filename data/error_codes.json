@@ -1,0 +1,202 @@
+{
+  "U0777": {
+    "name": "Data Validation Abend",
+    "description": "Job failed due to invalid data in a record. This typically occurs when data does not match the expected format defined in the copybook or when validation rules are violated.",
+    "common_causes": [
+      "Invalid characters in numeric fields",
+      "Data format mismatch with copybook definition",
+      "Missing or extra fields in record",
+      "Record length mismatch",
+      "Invalid date or time format"
+    ],
+    "resolution_steps": [
+      "Isolate the problematic record (check error message for record number)",
+      "Compare record structure with copybook definition",
+      "Verify data types match field definitions",
+      "Check for invalid characters or formatting issues",
+      "Fix the data in the input file",
+      "Re-run the failed step"
+    ],
+    "prevention": [
+      "Implement input validation before processing",
+      "Add data quality checks in upstream processes",
+      "Keep copybooks synchronized with data sources"
+    ]
+  },
+  "S013": {
+    "name": "Dataset Open Error",
+    "description": "Job failed to open a dataset due to DCB (Data Control Block) attribute mismatch. This commonly occurs when RECFM (Record Format) or LRECL (Logical Record Length) in JCL doesn't match the actual dataset attributes.",
+    "common_causes": [
+      "RECFM mismatch between JCL and dataset",
+      "LRECL mismatch between JCL and dataset",
+      "BLKSIZE incompatibility",
+      "Dataset not cataloged or not found",
+      "Incorrect DD statement in JCL"
+    ],
+    "resolution_steps": [
+      "Check the DD statement in JCL for the failing DDNAME",
+      "Verify RECFM and LRECL values in JCL",
+      "Compare with actual dataset attributes using ISPF 3.4 or LISTCAT",
+      "Correct the JCL DD statement to match dataset attributes",
+      "If dataset is new, ensure it's allocated with correct attributes",
+      "Re-run the job"
+    ],
+    "prevention": [
+      "Use standard DCB attributes across the organization",
+      "Document dataset attributes in runbooks",
+      "Use JCL procedures with predefined DCB parameters"
+    ]
+  },
+  "S0C7": {
+    "name": "Numeric Data Exception",
+    "description": "Program attempted to perform arithmetic operation on invalid numeric data. This occurs when a field defined as numeric contains non-numeric characters or is not properly initialized.",
+    "common_causes": [
+      "Non-numeric characters in numeric field",
+      "Uninitialized numeric fields",
+      "Data corruption during file transfer",
+      "Incorrect field definition in copybook",
+      "Character data moved to numeric field"
+    ],
+    "resolution_steps": [
+      "Identify the field causing the exception (check program dump)",
+      "Examine the data in the problematic field",
+      "Remove or replace invalid characters",
+      "Verify field is properly initialized before use",
+      "Check if data conversion is needed",
+      "Validate input data before processing",
+      "Re-run the job"
+    ],
+    "prevention": [
+      "Add numeric validation before arithmetic operations",
+      "Initialize all numeric fields properly",
+      "Implement data quality checks on input files",
+      "Use NUMVAL or NUMVAL-C for safe conversions"
+    ]
+  },
+  "S0C4": {
+    "name": "Protection Exception / Storage Violation",
+    "description": "Program attempted to access storage outside its allocated region or violated storage protection. This is a serious error indicating a program logic problem.",
+    "common_causes": [
+      "Array index out of bounds",
+      "Uninitialized pointer reference",
+      "Table overflow",
+      "Incorrect working storage definition",
+      "Memory corruption"
+    ],
+    "resolution_steps": [
+      "Review program dump to identify failing instruction",
+      "Check array subscripts and table references",
+      "Verify working storage definitions",
+      "Look for uninitialized pointers or addresses",
+      "Review recent program changes",
+      "Add boundary checking in the program",
+      "Recompile and test in development environment"
+    ],
+    "prevention": [
+      "Implement proper bounds checking",
+      "Initialize all variables before use",
+      "Use defensive programming techniques",
+      "Conduct thorough unit testing"
+    ]
+  },
+  "S0C1": {
+    "name": "Operation Exception",
+    "description": "Program attempted to execute an invalid operation code. This usually indicates program corruption or incorrect program load.",
+    "common_causes": [
+      "Program load module corruption",
+      "Incorrect program linkage",
+      "Overlay corruption",
+      "Wrong program version loaded",
+      "Storage overlay"
+    ],
+    "resolution_steps": [
+      "Verify correct program load module is being used",
+      "Check program compilation and link-edit steps",
+      "Recompile and relink the program",
+      "Verify program library is not corrupted",
+      "Check for storage overlays in calling programs",
+      "Review recent program deployments"
+    ],
+    "prevention": [
+      "Implement proper change management",
+      "Use version control for programs",
+      "Validate program loads before production",
+      "Maintain separate development and production libraries"
+    ]
+  },
+  "S322": {
+    "name": "Time-Out / Job Exceeded Time Limit",
+    "description": "Job exceeded the maximum CPU time or elapsed time specified in the JCL TIME parameter.",
+    "common_causes": [
+      "Infinite loop in program",
+      "Inefficient program logic",
+      "Larger than expected data volume",
+      "TIME parameter set too low",
+      "Database deadlock or contention"
+    ],
+    "resolution_steps": [
+      "Review program logic for infinite loops",
+      "Check if data volume has increased significantly",
+      "Analyze program performance and optimize if needed",
+      "Increase TIME parameter in JCL if appropriate",
+      "Check for database locks or contention",
+      "Review system resource availability"
+    ],
+    "prevention": [
+      "Set appropriate TIME parameters based on historical data",
+      "Implement timeout handling in programs",
+      "Monitor and optimize program performance regularly",
+      "Use efficient algorithms and data structures"
+    ]
+  },
+  "S806": {
+    "name": "Program Not Found",
+    "description": "System could not find the program specified in the EXEC statement. The program may not exist in the specified library or the library concatenation is incorrect.",
+    "common_causes": [
+      "Program not in STEPLIB or system library",
+      "Incorrect program name in EXEC statement",
+      "Library concatenation error",
+      "Program not linked or deployed",
+      "Authorization issue"
+    ],
+    "resolution_steps": [
+      "Verify program name spelling in EXEC statement",
+      "Check STEPLIB DD statement includes correct libraries",
+      "Verify program exists in specified library using ISPF 3.4",
+      "Check library concatenation order",
+      "Ensure program has been compiled and linked",
+      "Verify user has authorization to access the library"
+    ],
+    "prevention": [
+      "Maintain accurate program inventory",
+      "Use standard library concatenations",
+      "Implement proper deployment procedures",
+      "Document program locations in runbooks"
+    ]
+  },
+  "S222": {
+    "name": "Job Cancelled by Operator",
+    "description": "Job was cancelled by the system operator or automated monitoring tool, usually due to excessive resource usage or operational requirements.",
+    "common_causes": [
+      "Job running too long",
+      "Excessive resource consumption",
+      "System maintenance required",
+      "Operator intervention needed",
+      "Automated monitoring threshold exceeded"
+    ],
+    "resolution_steps": [
+      "Contact operations team to understand cancellation reason",
+      "Review job logs for resource usage",
+      "Check if job can be optimized",
+      "Reschedule job if it was cancelled for maintenance",
+      "Adjust resource parameters if needed",
+      "Coordinate with operations for rerun"
+    ],
+    "prevention": [
+      "Optimize job resource usage",
+      "Schedule resource-intensive jobs during off-peak hours",
+      "Communicate with operations about critical jobs",
+      "Implement proper job monitoring and alerting"
+    ]
+  }
+}
