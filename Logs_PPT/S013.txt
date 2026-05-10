@@ -1,0 +1,41 @@
+S013
+***********************************************************************
+*  SAMPLE MAINFRAME ABEND LOG - SYNTHETIC TEST DATA
+*  PURPOSE : TOOL TESTING / PARSING / RCA AUTOMATION
+*  SYSTEM  : z/OS 2.5 / JES2
+*  NOTE    : THIS IS NOT A REAL CUSTOMER LOG
+***********************************************************************
+
+$HASP373 INVJOB01 STARTED - INIT 07 - CLASS A - SYS STL1
+IEF403I INVJOB01 - STARTED - TIME=11.02.11
+
+IEF236I ALLOC. FOR INVJOB01 STEP010
+IGD103I SMS ALLOCATED TO DDNAME SORTIN
+IGD103I SMS ALLOCATED TO DDNAME SORTOUT
+IEF237I JES2 ALLOCATED TO SYSOUT
+
+IEC130I INVALID DATASET ATTRIBUTES
+IEC161I 013-20,INVJOB01,STEP010,SORT,DDNAME=SORTIN
+IGD104I DATA SET PROD.INPUT.INVENTORY NOT PROCESSED
+
+IEF450I INVJOB01 STEP010 - ABEND=S013 U0000 REASON=00000020
+IEF404I INVJOB01 - ENDED - TIME=11.02.20
+$HASP395 INVJOB01 ENDED - ABEND=S013
+
+-----------------------------------------------------------------------
+JOB SUMMARY
+-----------------------------------------------------------------------
+JOBNAME     : INVJOB01
+JOBID       : JOB45045
+OWNER       : INVUSER
+STEPNAME    : STEP010
+PROGRAM     : SORT
+STATUS      : ABENDED
+RETURN CODE : S013
+ERROR       : DATASET_DCB_MISMATCH
+START TIME  : 2026-04-20 11:02:11
+END TIME    : 2026-04-20 11:02:20
+
+***********************************************************************
+* END OF SAMPLE LOG
+***********************************************************************

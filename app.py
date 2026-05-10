@@ -377,7 +377,8 @@ def create_app(config_name='development'):
     @login_required
     def profile():
         """User profile page"""
-        return render_template('auth/profile.html')
+        from datetime import datetime
+        return render_template('auth/profile.html', now=datetime.now())
     
     @app.route('/output/<path:filename>')
     @login_required

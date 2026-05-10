@@ -31,7 +31,7 @@ class Config:
     # File Upload Configuration
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
     UPLOAD_FOLDER = 'uploads'
-    ALLOWED_EXTENSIONS = {'txt', 'log', 'png', 'jpg', 'jpeg'}
+    ALLOWED_EXTENSIONS = {'txt', 'log', 'png', 'jpg', 'jpeg', 'bmp', 'tiff'}
     
     # OpenAI Configuration
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
