@@ -377,8 +377,43 @@ def create_app(config_name='development'):
     @login_required
     def profile():
         """User profile page"""
-        from datetime import datetime
-        return render_template('auth/profile.html', now=datetime.now())
+        from datetime import datetime, timedelta
+        
+        # Get user's recent analyses
+        recent_analyses = AnalysisHistory.query.filter_by(user_id=current_user.id)\
+            .order_by(AnalysisHistory.created_at.desc())\
+            .limit(10)\
+            .all()
+        
+        # Calculate statistics
+        total_analyses = AnalysisHistory.query.filter_by(user_id=current_user.id).count()
+        
+        # Calculate days active (days since first analysis or registration)
+        first_analysis = AnalysisHistory.query.filter_by(user_id=current_user.id)\
+            .order_by(AnalysisHistory.created_at.asc())\
+            .first()
+        
+        if first_analysis:
+            days_active = (datetime.now() - first_analysis.created_at).days + 1
+        else:
+            days_active = (datetime.now() - current_user.created_at).days + 1
+        
+        # Count AI-assisted analyses
+        ai_assisted = AnalysisHistory.query.filter_by(
+            user_id=current_user.id,
+            extraction_method='hybrid'
+        ).count()
+        
+        stats = {
+            'total_analyses': total_analyses,
+            'days_active': days_active,
+            'ai_assisted': ai_assisted
+        }
+        
+        return render_template('auth/profile.html',
+                             stats=stats,
+                             recent_analyses=recent_analyses,
+                             now=datetime.now())
     
     @app.route('/output/<path:filename>')
     @login_required
